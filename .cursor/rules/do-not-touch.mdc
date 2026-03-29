@@ -1,0 +1,27 @@
+---
+description: "Protected files that should not be modified"
+globs: "packages/excalidraw/**"
+alwaysApply: true
+---
+
+# Protected Files
+
+NEVER modify these files without explicit approval:
+
+- `packages/excalidraw/scene/renderer.ts` — render pipeline
+- `packages/excalidraw/data/restore.ts` — file format compat
+- `packages/excalidraw/actions/manager.ts` — action system
+- `packages/excalidraw/types.ts` — core types
+
+Changes to protected files require:
+
+1. Full understanding of dependencies
+2. Running complete test suite
+3. Manual QA verification
+
+## How to verify
+
+- **`yarn test:all`** from repo root (typecheck, lint, Prettier, full Vitest run).
+- **`yarn build:packages`** (and **`yarn build`** if app packaging interacts) when render or restore output could affect dist consumers.
+- **Manual QA:** load/save `.excalidraw` fixtures, undo/redo, export image, and exercise keyboard/menu actions tied to `ActionManager` / `AppState` after `types` or `manager` edits; visual pass on canvas after `renderer` edits.
+- Do not merge without **explicit approval** for the protected path list above, even if CI is green.

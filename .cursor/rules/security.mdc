@@ -1,0 +1,59 @@
+---
+description: "Security guardrails — XSS, injection, secrets, unsafe browser/Node APIs"
+alwaysApply: true
+---
+
+# Security
+
+Apply these when adding or changing code that handles untrusted input, URLs, HTML, files, network, or credentials.
+
+## Secrets and configuration
+
+- **Never** commit API keys, tokens, passwords, private keys, or session cookies. Use environment variables or local config that is gitignored; reference only placeholder names in docs and code.
+- Do not log secrets, full auth headers, or PII. Redact or omit in error messages and telemetry.
+- Treat anything under user control (shared links, pasted scenes, imported files, collaborators) as **untrusted**.
+
+## Cross-site scripting (XSS) and HTML
+
+- Avoid `dangerouslySetInnerHTML`, `innerHTML`, `outerHTML`, and `document.write` with **unsanitized** or partially trusted strings. If rich HTML is required, use an established sanitizer and a strict allowlist; prefer text nodes or framework-safe rendering.
+- When inserting user or file-derived strings into SVG, canvas labels, or attributes, **escape or validate** so event handlers and `javascript:` URLs cannot appear.
+- Validate and normalize **URLs** before using in `href`, `src`, `window.open`, or redirects. Reject or strip `javascript:`, `data:` (where inappropriate), and unexpected schemes; prefer relative URLs or fixed origins when opening external links.
+
+## Code injection and dynamic execution
+
+- Do not pass user or file content into `eval`, `new Function`, `setTimeout`/`setInterval` with string arguments, or dynamic `import()` / `require()` built from user paths.
+- Avoid building shell commands from user input in **scripts** (`exec`, `spawn` with `shell: true`). Prefer argv parsing and fixed command shapes.
+
+## Browser messaging and embeds
+
+- For `postMessage`, always **check `event.origin`** (or equivalent) against an allowlist before trusting data; do not use `"*"` for sensitive flows.
+- For **iframes** and third-party embeds, use minimal permissions (`sandbox`, `allow` only what is needed) and prefer explicit dimensions and CSP-friendly sources.
+
+## Network and cookies
+
+- When changing `fetch` or XHR: be deliberate about **`credentials`**, cookies, and storing tokens in `localStorage` vs `httpOnly` cookies. Do not widen CORS or expose sensitive headers without a clear threat model.
+- Use **HTTPS** URLs for production endpoints and avoid mixed content when loading assets.
+
+## Files and deserialization
+
+- Treat uploaded or imported files as hostile: limit size, validate format/magic bytes where relevant, and avoid executing their contents as code.
+- When parsing structured data (JSON, scene format), validate shape and reject unknown or oversized fields instead of blindly merging into app state.
+
+## Dependencies and supply chain
+
+- **No new npm packages** without explicit approval (see `architecture.mdc`). Prefer audited, maintained dependencies; avoid copy-pasting snippets from untrusted sources into security-sensitive paths.
+
+## Cryptography
+
+- Do not invent custom crypto. Use platform APIs (`SubtleCrypto` in browsers, well-vetted Node APIs) or existing project patterns for hashing/signing.
+
+## When in doubt
+
+- Prefer the **smallest trust boundary**: validate early, default-deny for URLs and HTML, and add tests that assert malicious-looking inputs are rejected or neutralized.
+
+## How to verify
+
+- Add or extend **automated tests** where the bug class is testable (e.g. URL parsing, sanitizer behavior, parser rejection of malformed input).
+- Run **`yarn test:app --watch=false`** for affected areas; use **`yarn test:all`** before merging security-sensitive or wide-reaching changes.
+- **Manual checks** for UX-facing flows: paste hostile samples, exercise import/export and share flows, and confirm no script execution or unexpected navigation.
+- **Dependency / secret hygiene**: `yarn test:code` (ESLint); ensure no credentials in diff; review new third-party code paths (package additions need explicit approval).

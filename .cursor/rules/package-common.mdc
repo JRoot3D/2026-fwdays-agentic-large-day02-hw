@@ -1,0 +1,28 @@
+---
+description: "@excalidraw/common — shared constants, colors, browser utilities"
+globs: packages/common/**
+alwaysApply: false
+---
+
+# Package: `@excalidraw/common`
+
+## Role
+
+- Foundation layer: **pure helpers**, shared constants, i18n keys, color utilities, throttling helpers, and browser-oriented utilities used across the monorepo.
+- **No React** — keep this package framework-agnostic.
+
+## Dependencies
+
+- MAY depend only on what `packages/common/package.json` already allows (e.g. `tinycolor2`).
+- MUST NOT import from `@excalidraw/math`, `@excalidraw/element`, `@excalidraw/excalidraw`, or `@excalidraw/utils` (avoid upward/cyclic coupling).
+
+## Conventions
+
+- Prefer small, well-named exports from `src/` and re-export via the package entry (`src/index.ts`).
+- Colocate tests under `packages/common/tests/` or next to modules per existing patterns (`*.test.ts` / `*.test.tsx`).
+
+## How to verify
+
+- `yarn --cwd ./packages/common build:esm` (or `yarn build:common` from repo root) when exports or build output matter.
+- `yarn test:app --watch=false` with a path filter on `packages/common` when tests exist for the change.
+- Wide API surface changes: `yarn test:typecheck` and a broader test run (many packages depend on `common`).

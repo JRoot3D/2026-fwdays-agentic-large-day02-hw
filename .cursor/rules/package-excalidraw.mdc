@@ -1,0 +1,35 @@
+---
+description: "@excalidraw/excalidraw — React editor, actions, canvas UI"
+globs: packages/excalidraw/**
+alwaysApply: false
+---
+
+# Package: `@excalidraw/excalidraw`
+
+## Role
+
+- **Embeddable editor**: React `Excalidraw` component, `App`, `ActionManager`, contexts, canvas layers, dialogs, import/export UI, and integration with `@excalidraw/element` / `@excalidraw/math` / `@excalidraw/common`.
+- This is the **primary published package** for hosts embedding Excalidraw.
+
+## Architecture (see also `architecture.mdc`, `do-not-touch.mdc`)
+
+- **State**: Editor chrome and interaction state → **`AppState`** (`types.ts`) and `App` state; element geometry → **`Scene`** / **`Store`** in `@excalidraw/element`. Prefer **`actionManager.dispatch`** / **`Action.perform`** for user-visible changes, not ad-hoc parallel state systems.
+- **Rendering**: Scene drawn with **canvas 2D** — do not move the editor canvas to react-konva/fabric/pixi.
+- **Protected files** (`renderer.ts`, `restore.ts`, `actions/manager.ts`, `types.ts`) require explicit approval and full verification before edits.
+
+## Dependencies
+
+- MAY use workspace packages and the dependencies already declared in `packages/excalidraw/package.json`.
+- **No new npm dependencies** without explicit approval (repo-wide policy).
+
+## Conventions
+
+- **Functional components** + hooks where adding new UI; existing `App` may remain class-based — follow surrounding patterns.
+- Colocate **`ComponentName.test.tsx`** and use `packages/excalidraw/tests/test-utils` for integration-style tests.
+
+## How to verify
+
+- `yarn build:excalidraw` or `yarn --cwd ./packages/excalidraw build:esm`.
+- `yarn test:app --watch=false` — use a path filter under `packages/excalidraw` when changes are localized.
+- If `AppState`, actions, or scene sync behavior changed: favor full `yarn test:app --watch=false` or `yarn test:all`.
+- Edits to **protected files** (`do-not-touch.mdc`): only with approval; then `yarn test:all` plus manual QA.

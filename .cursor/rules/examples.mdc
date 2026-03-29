@@ -1,0 +1,25 @@
+---
+description: "examples/* — embed demos (Vite, Next.js)"
+globs: examples/**
+alwaysApply: false
+---
+
+# Workspace: `examples/`
+
+## Role
+
+- **Integration demos** showing how to embed Excalidraw in different hosts (`with-script-in-browser`, `with-nextjs`).
+- Keep examples **minimal and instructional** — not a second product surface.
+
+## Conventions
+
+- Depend on workspace packages the same way consumers would (`@excalidraw/excalidraw`, etc.). Prefer the **documented public API** over reaching into monorepo-only paths.
+- Next.js example: respect framework constraints (SSR, dynamic import, `react`/`react-dom` versions aligned with the example’s `package.json`).
+- Do not duplicate large chunks of editor logic here — if something is generally useful, add it to a `packages/*` package instead.
+- Run example scripts via `yarn --cwd ./examples/<name> ...` per that package’s README/package.json.
+
+## How to verify
+
+- From repo root, build workspace packages if the example depends on them: `yarn build:packages` (or the example’s `build:packages` / `build:workspace` script).
+- Per example: e.g. `yarn --cwd ./examples/with-nextjs build`, `yarn --cwd ./examples/with-script-in-browser build` (see each folder’s `package.json` for `dev` / `build` / `start`).
+- Fix any new lint/type errors the example’s tooling reports (`next lint`, local `tsc`, etc.).

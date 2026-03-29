@@ -1,0 +1,23 @@
+---
+description: "dev-docs — internal / developer documentation site"
+globs: dev-docs/**
+alwaysApply: false
+---
+
+# Workspace: `dev-docs`
+
+## Role
+
+- **Developer-facing documentation** (build tooling, site config in `dev-docs/package.json`). Not part of the published editor bundle.
+
+## Conventions
+
+- Keep content accurate with the **current monorepo**; when documenting flows, reference real paths (`packages/excalidraw/...`, `excalidraw-app/...`).
+- Follow whatever static-site or doc framework the folder already uses — do not introduce a second doc stack without an explicit decision.
+- Typo/link fixes and clarifications are welcome; avoid stale claims about APIs that no longer exist.
+
+## How to verify
+
+- `yarn --cwd ./dev-docs typecheck`
+- `yarn --cwd ./dev-docs build` (Docusaurus build must succeed)
+- Optional: `yarn --cwd ./dev-docs start` and spot-check edited pages locally

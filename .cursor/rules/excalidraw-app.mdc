@@ -1,0 +1,30 @@
+---
+description: "excalidraw-app — Vite host, collab, Firebase, Sentry"
+globs: excalidraw-app/**
+alwaysApply: false
+---
+
+# Workspace: `excalidraw-app`
+
+## Role
+
+- **Full product shell**: Vite React app that embeds `@excalidraw/excalidraw`, adds hosting-specific features (collaboration, persistence, PWA, analytics, Firebase, Sentry, etc.).
+- **Not published as `@excalidraw/excalidraw`** — this is private app code; library behavior belongs in `packages/excalidraw`.
+
+## Boundaries
+
+- Import the editor via **`@excalidraw/excalidraw`** (and other `@excalidraw/*` packages). Avoid deep-importing private internals of the library unless already established in this app — prefer public exports.
+- **`vite.config.mts`** aliases point at `packages/*` source — keep alias targets consistent with monorepo layout when adding new workspace paths.
+
+## Conventions
+
+- App wiring (routing, collab socket URLs, env-based config) lives here; **core editor rules** (actions, scene invariants) still belong in `packages/excalidraw` or `packages/element`.
+- Respect **secrets via env** (Firebase, Sentry DSN, collab endpoints) — never commit tokens (see `security.mdc`).
+- Dev entry: `yarn start` from repo root (runs app dev server). Build: `yarn build` (app production build). Tests: `excalidraw-app/tests/` with Vitest.
+
+## How to verify
+
+- `yarn build` from repo root (Vite production build for `excalidraw-app`).
+- `yarn test:app --watch=false` (includes `excalidraw-app/tests/` via root Vitest config).
+- For collab/Firebase/env changes: `yarn start` and exercise the affected flow manually; confirm secrets stay in env, not in source.
+- Broader gate when unsure: `yarn test:all`.

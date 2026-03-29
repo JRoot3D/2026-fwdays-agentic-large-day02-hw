@@ -1,0 +1,29 @@
+---
+description: "@excalidraw/math — 2D geometry, vectors, Point types"
+globs: packages/math/**
+alwaysApply: false
+---
+
+# Package: `@excalidraw/math`
+
+## Role
+
+- **Numeric / geometric primitives**: points, vectors, lines, curves, ranges, angles — types and functions for 2D editor math.
+- **No React** — library code only.
+
+## Dependencies
+
+- MAY import `@excalidraw/common`.
+- MUST NOT import `@excalidraw/element`, `@excalidraw/excalidraw`, or `@excalidraw/utils`.
+
+## Conventions
+
+- Use and expose shared types from this package (e.g. **`Point`**, **`Radians`**, **`LocalPoint`**) rather than ad-hoc `{ x, y }` at call sites that cross package boundaries. See `packages/math/src/types.ts`.
+- Prefer immutable-style helpers (return new values) unless an existing API is explicitly mutating.
+- Keep functions deterministic and side-effect free where possible (easier to test under `packages/math/tests/`).
+
+## How to verify
+
+- `yarn --cwd ./packages/math build:esm` (or `yarn build:math` from repo root).
+- `yarn test:app --watch=false` with a path filter on `packages/math/tests` when practical.
+- If math types feed into `element` / `excalidraw`: also run `yarn test:typecheck`.

@@ -1,0 +1,30 @@
+---
+description: "@excalidraw/element — scene, elements, store, history"
+globs: packages/element/**
+alwaysApply: false
+---
+
+# Package: `@excalidraw/element`
+
+## Role
+
+- **Data model and geometry for canvas elements**: element types, scene graph (`Scene`), mutation helpers, store/history capture, bindings, z-order, hit-testing, resize/drag logic, etc.
+- **No React in core `src/`** — this layer must remain usable from headless or non-UI code paths.
+
+## Dependencies
+
+- MAY import `@excalidraw/common`, `@excalidraw/math`, and **`@excalidraw/utils`** subpaths already used for geometry/export helpers (e.g. `shape`, `bbox`, `withinBounds`).
+- MUST NOT import `@excalidraw/excalidraw` (no React editor in this package).
+
+## Conventions
+
+- Scene updates go through established APIs (`mutateElement`, `replaceAllElements`, store `scheduleAction` / `commit` patterns as documented in `docs/technical/architecture.md`). Do not bypass the store/history contract without a strong reason and tests.
+- Prefer **`@excalidraw/math`** types for coordinates and angles; avoid duplicating geometry helpers that already exist in math.
+- **Exported surface** is consumed by `packages/excalidraw` and public `element` subpaths — preserve backward compatibility for serialized shapes and public helpers.
+- Tests live in `packages/element/tests/` (and `src/__tests__/` where present).
+
+## How to verify
+
+- `yarn --cwd ./packages/element build:esm` (or `yarn build:element` from repo root).
+- `yarn test:app --watch=false` — include `packages/element` if you use a Vitest path filter; otherwise run the full suite for risky scene/store changes.
+- For cross-package API changes: `yarn test:typecheck` from repo root.

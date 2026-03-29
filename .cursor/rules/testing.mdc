@@ -1,0 +1,43 @@
+---
+description: "Test conventions — Vitest, Testing Library, snapshots"
+globs: **/*.test.ts,**/*.test.tsx,setupTests.ts
+alwaysApply: false
+---
+
+# Test Conventions
+
+## Runner and environment
+
+- **Vitest** at the repo root (`vitest.config.mts`). Globals are enabled: `describe`, `it`, `test`, `expect`, `vi`, `beforeEach`, `afterEach`, etc. — no need to import them in every file unless you prefer explicit imports.
+- Default test environment is **jsdom**; global setup lives in `setupTests.ts` (canvas mock, jest-dom matchers, shared mocks).
+- Run tests from the repo root: `yarn test` (watch) or `yarn test:app --watch=false` for a single run. Full gate: `yarn test:all` (typecheck, lint, Prettier, tests).
+
+## File naming and placement
+
+- Suffix test files with **`.test.ts`** or **`.test.tsx`** (not `.spec`).
+- **Colocate** tests next to the module when it fits the tree: `ComponentName.test.tsx` beside `ComponentName.tsx`.
+- Package-level suites may live under `tests/` (e.g. `packages/excalidraw/tests/`, `packages/math/tests/`). Keep the same `*.test.*` naming inside those folders.
+
+## React / Excalidraw integration tests
+
+- Prefer **`@testing-library/react`** for rendering and queries (`render`, `screen`, `fireEvent`, `waitFor`, `within`). The project extends matchers with **`@testing-library/jest-dom`** (see `setupTests.ts`).
+- For Excalidraw editor tests, reuse patterns from existing suites: import **`render`**, **`act`**, **`GlobalTestState`**, etc. from `packages/excalidraw/tests/test-utils` (or the nearest established helper) instead of inventing parallel harnesses.
+- Use **`vi`** from `vitest` for mocks, spies, and fake timers. Prefer `vi.mock` / `vi.fn` over ad hoc globals.
+
+## Style and quality
+
+- Write **focused** examples: one behavior per `it` when practical; use nested `describe` blocks to group related cases.
+- Prefer **`expect`** assertions that match observable behavior (DOM, state, return values). Avoid testing private implementation details unless there is no stable surface.
+- **Snapshots**: use intentionally; update with `yarn test:update` when outputs change on purpose, and review diff carefully.
+- Keep tests **deterministic** — avoid real timers, network, or wall-clock dependence unless the file is explicitly an integration test with controlled fakes.
+
+## TypeScript
+
+- Same strictness as production code: avoid `any` and `@ts-ignore` in tests unless unavoidable; prefer typed fixtures and helpers.
+
+## How to verify
+
+- **Narrow:** `yarn test:app --watch=false` with a Vitest path or name filter matching the file(s) you touched.
+- **Default:** `yarn test:app --watch=false` for the whole suite when shared setup (`setupTests.ts`) or many tests might interact.
+- **CI parity:** `yarn test:all` (typecheck, ESLint, Prettier, tests) before claiming a branch is green.
+- **Snapshots:** after intentional output changes, `yarn test:update` and review the diff; re-run `yarn test:app --watch=false` without update.

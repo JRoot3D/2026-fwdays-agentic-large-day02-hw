@@ -1,0 +1,27 @@
+---
+description: "@excalidraw/utils — export, PNG, fonts, canvas-adjacent helpers"
+globs: packages/utils/**
+alwaysApply: false
+---
+
+# Package: `@excalidraw/utils`
+
+## Role
+
+- **Utility layer** for export pipelines, image/PNG handling, font-related helpers, and other shared non-UI tooling (see `packages/utils/src/` and package description). Consumed by the editor and related workflows.
+
+## Dependencies
+
+- Treat `packages/utils/package.json` as the source of truth for published externals; **do not add new npm packages** without explicit repo approval.
+- Source may import **`@excalidraw/element`** (and element types) for bounds, shapes, and export — this matches existing modules such as `export.ts` / `shape.ts`. Do not import **`@excalidraw/excalidraw`** (React editor); the dependency direction stays host/editor → utils, not UI code inside this package.
+
+## Conventions
+
+- Keep APIs **pure or clearly side-effecting** (I/O, canvas, filesystem helpers) and documented at export boundaries.
+- Tests under `packages/utils/tests/`.
+
+## How to verify
+
+- `yarn --cwd ./packages/utils build:esm`.
+- `yarn test:app --watch=false` (Vitest picks up `packages/utils/tests/`); narrow with a path filter when possible.
+- If export or element types changed: `yarn test:typecheck` and consider `yarn build:packages` before integration testing.
